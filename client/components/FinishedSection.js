@@ -1,30 +1,26 @@
-import * as React from 'react';
+import React, {Component} from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import * as WebBrowser from 'expo-web-browser';
-import { RectButton, ScrollView } from 'react-native-gesture-handler';
+// import { Ionicons } from '@expo/vector-icons';
+// import * as WebBrowser from 'expo-web-browser';
+import { RectButton } from 'react-native-gesture-handler';
 
-export default function FinishedSection(props) {
+export default class FinishedSection extends Component {
+  constructor(props) {
+    super(props)
+  }
+  render() {
   return (
       <View style = {styles.container}>
           <Text style = {styles.label}>Finished?</Text>
           <Text style = {styles.description}>Go ahead and click done to log into google and update your calendar!</Text>
-          <OptionButton
-            label="Done"
-            onPress={() => props.submit()}
-          />
+          <RectButton style={styles.buttonStyle} onPress={this.props.submit}>
+            <View style={styles.buttonStyle}>
+              <Text style={styles.buttonText}>Done</Text>
+            </View>
+          </RectButton>
       </View>
   );
   }
-
-  function OptionButton({ label, onPress }) {
-    return (
-      <RectButton style={styles.buttonStyle} onPress={onPress}>
-          <View style={styles.buttonStyle}>
-            <Text style={styles.buttonText}>{label}</Text>
-          </View>
-      </RectButton>
-    );
   }
 
 const styles = StyleSheet.create({

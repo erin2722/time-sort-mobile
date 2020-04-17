@@ -1,46 +1,12 @@
-import * as React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import * as WebBrowser from 'expo-web-browser';
-import { RectButton, ScrollView } from 'react-native-gesture-handler';
+import React, {Component} from 'react';
+import { StyleSheet } from 'react-native';
+import { ScrollView } from 'react-native-gesture-handler';
 
 import FinishedSection from '../components/FinishedSection';
 import ObjectiveForm from '../components/ObjectiveForm';
 import ObjectiveList from '../components/ObjectiveList';
 import TimeBoundSection from '../components/TimeBoundSection';
 
-export default function LinksScreen() {
-  const [tasks, addTask] = React.useState([]);
-  const [startTime, setStart] = React.useState(new Date())
-  const [endTime, setEnd] = React.useState(new Date())
-
-
-  const addNewTask = (newTask) => {
-    addTask(tasks.push(newTask))
-    console.log(tasks)
-  }
-
-  const setTimeBound = (time, index) => {
-    if(index === 0) {
-      setStart(time)
-    } else {
-      setEnd(time)
-    }
-  }
-
-  const submit = () => {
-    console.log(tasks)
-  }
-
-  return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
-      <ObjectiveForm addTask={addNewTask} />
-      <ObjectiveList tasks = {tasks} />
-      <TimeBoundSection setTimeBound = {setTimeBound} />
-      <FinishedSection submit = {submit} />
-    </ScrollView>
-  );
-}
 
 const styles = StyleSheet.create({
   container: {
@@ -48,7 +14,78 @@ const styles = StyleSheet.create({
     backgroundColor: '#fafafa',
   },
   contentContainer: {
-    paddingTop: 15,
+    paddingTop: 0,
   },
 
 });
+
+
+export default class LinksScreen extends Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      tasks: [],
+      startTime: new Date(),
+      endTime: new Date()
+    }
+
+    this.addNewTask = this.addNewTask.bind(this)
+    this.deleteTask = this.deleteTask.bind(this)
+    this.setTimeBound = this.setTimeBound.bind(this)
+    this.submit = this.submit.bind(this)
+  }
+
+
+  addNewTask(newTask) {
+    this.setState({
+      tasks: this.state.tasks.concat(newTask)
+    })
+  }
+  
+  deleteTask(deletedTask) {
+    let tasks = this.state.tasks
+    var found = true
+    var index;
+    for(var i = 0; i < tasks.length; i+=1) {
+      for(var p in tasks[i]) {
+        if(tasks[i][p] !== deletedTask[p]) {
+          found = false
+        }
+      }
+      if(found) index = i
+    }
+    tasks.splice(index, 1)
+    this.setState({
+      tasks: tasks
+    })
+  }
+
+  setTimeBound(time, index) {
+    if(index === 0) {
+      this.setState({
+        startTime: time
+      })
+    } else {
+      this.setState({
+        endTime: time
+      })
+    }
+  }
+
+  submit() {
+    console.log("hi")
+    console.log(this.state.tasks)
+  }
+
+  render() {
+  return (
+    <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
+      <ObjectiveForm addTask={this.addNewTask} />
+      <ObjectiveList tasks = {this.state.tasks} deleteTask={this.deleteTask} />
+      <TimeBoundSection setTimeBound = {this.setTimeBound} />
+      <FinishedSection submit = {this.submit} />
+    </ScrollView>
+  );
+  }
+}

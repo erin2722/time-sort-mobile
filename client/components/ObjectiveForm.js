@@ -1,130 +1,158 @@
-import React, {useState} from 'react';
+import React, {Component} from 'react';
 import { StyleSheet, Text, View, TextInput, Platform, Switch } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { Ionicons } from '@expo/vector-icons';
-import * as WebBrowser from 'expo-web-browser';
-import { RectButton, ScrollView } from 'react-native-gesture-handler';
+import { RectButton } from 'react-native-gesture-handler';
 
-export default function ObjectiveForm(props) {
-    //name state
-    const [name, setDescriptionText] = useState('');
+export default class ObjectiveForm extends Component {
 
-    //time and date state
-    const [date, setDate] = useState(new Date(1598051730000));
-    const [showDate, setShowDate] = useState(false);
-    const [showTime, setShowTime] = useState(false);
+    constructor(props) {
+        super(props)
 
-    //set hours state
-    const [hours, setHours] = useState('1');
+        this.state = {
+            name: '',
+            date: new Date(),
+            showDate: false,
+            showTime: false,
+            hours: '1',
+            isEnabled: false
+        }
 
-    //toggle state
-    const [isEnabled, setIsEnabled] = useState(false);
+        this.onChangeText = this.onChangeText.bind(this)
+        this.onChange = this.onChange.bind(this)
+        this.showDatepicker = this.showDatepicker.bind(this)
+        this.showTimepicker = this.showTimepicker.bind(this)
+        this.onChangeHours = this.onChangeHours.bind(this)
+        this.toggleSwitch = this.toggleSwitch.bind(this)
+        this.submit = this.submit.bind(this)
+    }
 
     //function for name
-    const onChangeText = (text) => {
-        setDescriptionText(text)
+    onChangeText(text) {
+        this.setState({
+            name: text
+        })
     }
 
     //function for time pickers
-    const onChange = (event, selectedDate) => {
-        const currentDate = selectedDate || date;
-        setDate(currentDate);
+    onChange(event, selectedDate) {
+        const currentDate = selectedDate || this.state.date;
+        this.setState({
+            date: currentDate
+        })
     };
  
-    const showDatepicker = () => {
-        setShowDate(!showDate);
+    showDatepicker() {
+        this.setState({
+            showDate: !this.state.showDate
+        })
     };
  
-    const showTimepicker = () => {
-        setShowTime(!showTime);
+    showTimepicker() {
+        this.setState({
+            showTimepicker: !this.state.showTimepicker
+        })
     };
 
-    //function for name
-    const onChangeHours = (text) => {
-        setHours(text)
+    onChangeHours(text) {
+        this.setState({
+            hours: text
+        })
     }
 
     //for toggle switch
-    const toggleSwitch = () => setIsEnabled(previousState => !previousState);
-
-    const submit = () => {
-        let task = {
-            name: name,
-            date: date,
-            hours: hours,
-            breakUp: isEnabled
-        }
-
-        props.addTask(task)
+    toggleSwitch() {
+        this.setState({
+            isEnabled: !this.state.isEnabled
+        })
     }
 
+    submit() {
+        let task = {
+            name: this.state.name,
+            date: this.state.date,
+            hours: this.state.hours,
+            breakUp: this.state.isEnabled
+        }
 
+        this.setState({
+            name: '',
+            date: new Date(),
+            showDate: false,
+            showTime: false,
+            hours: '1',
+            isEnabled: false
+        })
+
+        this.props.addTask(task)
+    }
+
+    render() {
     return (
         <View style = {styles.container}>
             <Text style = {styles.label}>Enter an Objective:</Text>
             <Text style = {styles.description}>Objective Title (This is what will show up on your calendar):</Text>
             <TextInput
                 style={styles.input}
-                onChangeText={text => onChangeText(text)}
-                value={name}
+                onChangeText={text => this.onChangeText(text)}
+                value={this.state.name}
                 placeholder = {"Eg. Read Chapter 4 in Physics Textbook..."}
                 />
             <View>
-                <RectButton style={styles.buttonStyle} onPress={showDatepicker}>
+                <RectButton style={styles.buttonStyle} onPress={this.showDatepicker}>
                     <View style={styles.dateButton}>
-                        <Text style={styles.buttonText}>Choose the Due Date: {(date.getMonth() + 1) + "/" + date.getDate()}
+                        <Text style={styles.buttonText}>Choose the Due Date: {(this.state.date.getMonth() + 1) + "/" + this.state.date.getDate()}
                         </Text>
                     </View>
                 </RectButton>
             </View>
-            {showDate &&
+            {this.state.showDate &&
             <DateTimePicker
                 testID="dateTimePicker"
-                value={date}
+                value={this.state.date}
                 mode={"date"}
                 is24Hour={true}
                 display="default"
-                onChange={onChange}
+                onChange={this.onChange}
             />
             }
             <View>
-                <RectButton style={styles.buttonStyle} onPress={showTimepicker}>
+                <RectButton style={styles.buttonStyle} onPress={this.showTimepicker}>
                     <View style={styles.dateButton}>
-                        <Text style={styles.buttonText}>Choose the Time Due: {date.getHours() + ":" + date.getMinutes()}</Text>
+                        <Text style={styles.buttonText}>Choose the Time Due: {this.state.date.getHours() + ":" + this.state.date.getMinutes()}</Text>
                     </View>
                 </RectButton>
             </View>
-            {showTime &&
+            {this.state.showTime &&
             <DateTimePicker
                 testID="dateTimePicker"
-                value={date}
+                value={this.state.date}
                 mode={"time"}
                 is24Hour={true}
                 display="default"
-                onChange={onChange}
+                onChange={this.onChange}
             />
             }
             <View>
                 <Text style = {styles.description}>How many hours do you think this objective will take? (defaults to 1 hour if left blank)</Text>
                 <TextInput
                     style={styles.input}
-                    onChangeText={text => onChangeHours(text)}
-                    value={hours}
+                    onChangeText={text => this.onChangeHours(text)}
+                    value={this.state.hours}
                 />
             </View>
             <View>
                 <Text style={styles.description}>Break it up into smaller tasks?</Text>
                 <Switch
                     trackColor={{ false: "#767577", true: "#81b0ff" }}
-                    thumbColor={isEnabled ? "#f5dd4b" : "#f4f3f4"}
+                    thumbColor={this.state.isEnabled ? "#767577" : "#f4f3f4"}
                     ios_backgroundColor="#3e3e3e"
-                    onValueChange={toggleSwitch}
-                    value={isEnabled}
+                    onValueChange={this.toggleSwitch}
+                    value={this.state.isEnabled}
                     style={styles.switch}
                 />
             </View>
             <View>
-                <RectButton style={styles.buttonStyle2} onPress={submit}>
+                <RectButton style={styles.buttonStyle2} onPress={this.submit}>
                     <View style={styles.buttonStyle2}>
                         <Text style={styles.buttonText2}>+ Add Task</Text>
                     </View>
@@ -132,13 +160,14 @@ export default function ObjectiveForm(props) {
             </View>
       </View>
   );
+        }
   }
 
 const styles = StyleSheet.create({
     container: {
       display: "flex",
       flex: 1,
-      backgroundColor: "#f2f2f2",
+      backgroundColor: "white",
       padding: 30,
     },
     label: {

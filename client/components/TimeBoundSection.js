@@ -1,86 +1,107 @@
-import React, {useState} from 'react';
-import { StyleSheet, Text, View, TextInput, Platform, Switch } from 'react-native';
+import React, { Component} from 'react';
+import { StyleSheet, Text, View } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { Ionicons } from '@expo/vector-icons';
-import * as WebBrowser from 'expo-web-browser';
-import { RectButton, ScrollView } from 'react-native-gesture-handler';
+import { RectButton } from 'react-native-gesture-handler';
 
-export default function ObjectiveForm(props) {
-    //time and date state
-    const [date1, setDate1] = useState(new Date(1598051730000));
-    const [date2, setDate2] = useState(new Date(1598051730000));
-    const [showDate1, setShowDate1] = useState(false);
-    const [showDate2, setShowDate2] = useState(false);
+export default class ObjectiveForm extends Component {
+    constructor(props) {
+        super(props)
+
+        this.state = {
+            date1: new Date(),
+            date2: new Date(),
+            showDate1: false,
+            showDate2: false
+        }
+
+        this.onChange1 = this.onChange1.bind(this)
+        this.onChange2 = this.onChange2.bind(this)
+        this.showDatepicker1 = this.showDatepicker1.bind(this)
+        this.showDatepicker2 = this.showDatepicker2.bind(this)
+    }
 
     //function for time pickers
-    const onChange1 = (event, selectedDate) => {
-        const currentDate = selectedDate || date1;
-        setDate1(currentDate);
-        props.setTimeBound(currentDate, 0)
+    onChange1(event, selectedDate) {
+        const currentDate = selectedDate || this.state.date1;
+        this.setState({
+            date1: currentDate
+        })
+        this.props.setTimeBound(currentDate, 0)
     };
 
-    const onChange2 = (event, selectedDate) => {
-        const currentDate = selectedDate || date2;
-        setDate2(currentDate);
-        props.setTimeBound(currentDate, 1)
+    onChange2(event, selectedDate) {
+        const currentDate = selectedDate || this.state.date2;
+        this.setState({
+            date2: currentDate
+        })
+        this.props.setTimeBound(currentDate, 1)
     };
  
-    const showDatepicker1 = () => {
-        setShowDate1(!showDate1);
+    showDatepicker1() {
+        console.log("ih")
+        this.setState({
+            showDatepicker1: !this.state.showDatepicker1
+        })
     };
  
-    const showDatepicker2 = () => {
-        setShowDate2(!showDate2);
+    showDatepicker2() {
+        this.setState({
+            showDatepicker2: !this.state.showDatepicker2
+        })
     };
-
+    render() {
     return (
         <View style = {styles.container}>
             <Text style = {styles.label}>Special Time Requirements</Text>
-            <Text style = {styles.description}>By default, we will not schedule objectives before 7:00am or after 11:00pm. If you're okay with those constraints, leave these next two steps blank.</Text>
+            <Text style = {styles.description}>By default, we will not schedule objectives before 7:00am or after 11:00pm. 
+            If you're okay with those constraints, leave these next two steps blank.</Text>
             <View>
-                <RectButton style={styles.buttonStyle} onPress={showDatepicker1}>
+                <RectButton style={styles.buttonStyle} onPress={this.showDatepicker1}>
                     <View style={styles.dateButton}>
-                        <Text style={styles.buttonText}>No tasks before: {date1.getHours() + ":" + date1.getMinutes()}
+                        <Text style={styles.buttonText}>No tasks before: {this.state.date1.getHours() + ":" 
+                        + this.state.date1.getMinutes()}
                         </Text>
                     </View>
                 </RectButton>
             </View>
-            {showDate1 &&
+            {this.state.showDatepicker1 &&
             <DateTimePicker
                 testID="dateTimePicker"
-                value={date1}
+                value={this.state.date1}
                 mode={"time"}
                 is24Hour={true}
                 display="default"
-                onChange={onChange1}
+                onChange={this.onChange1}
             />
             }
             <View>
-                <RectButton style={styles.buttonStyle} onPress={showDatepicker2}>
+                <RectButton style={styles.buttonStyle} onPress={this.showDatepicker2}>
                     <View style={styles.dateButton}>
-                        <Text style={styles.buttonText}>No tasks after: {date2.getHours() + ":" + date2.getMinutes()}</Text>
+                        <Text style={styles.buttonText}>No tasks after: 
+                        {this.state.date2.getHours() + ":" + this.state.date2.getMinutes()}</Text>
                     </View>
                 </RectButton>
             </View>
-            {showDate2 &&
+            {this.state.showDatepicker2 &&
             <DateTimePicker
                 testID="dateTimePicker"
-                value={date2}
+                value={this.state.date2}
                 mode={"time"}
                 is24Hour={true}
                 display="default"
-                onChange={onChange2}
+                onChange={this.onChange2}
             />
             }
       </View>
-  );
+    );
+    }
   }
 
 const styles = StyleSheet.create({
     container: {
       display: "flex",
       flex: 1,
-      backgroundColor: "#f2f2f2",
+      backgroundColor: "white",
       padding: 30,
     },
     label: {
